@@ -11,6 +11,10 @@ app.get('/', (req, res) => {
   `);
 });
 
+app.get("/Listings", (req, res) => {
+  res.send("This is where tennis matches near you will likely go!")
+});
+
 app.listen(port, () => {
   console.log(`Matchmaker server is running at http://localhost:${port}`);
 });
