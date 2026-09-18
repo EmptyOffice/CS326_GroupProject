@@ -15,6 +15,10 @@ app.get("/Listings", (req, res) => {
   res.send("This is where tennis matches near you will likely go!")
 });
 
+app.use((req, res) => {
+  res.status(404).send('Page not found.');
+});
+
 app.listen(port, () => {
   console.log(`Matchmaker server is running at http://localhost:${port}`);
 });
