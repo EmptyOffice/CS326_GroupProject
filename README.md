@@ -1,11 +1,8 @@
 # CS326_GroupProject
 
 | Name | GitHub Username |
-
 | William Bae | willibae |
-
 | Edelson Garcia | EmptyOffice |
-
 | Alexandria Anderson | alexandriaan-hub |
 
 Local Tennis Matchmaker in the Pioneer Valley area
