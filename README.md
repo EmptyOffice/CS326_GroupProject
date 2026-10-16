@@ -20,12 +20,19 @@ Instructions to run the server:
 - Clone the repository by entering the following into the terminal: 
     git clone https://github.com/EmptyOffice/CS326_GroupProject.git
 - Change your directory in the terminal to the repository (...\CS326_GroupProject.git)
-- Install express within the repository by entering the following into the terminal:
-    npm install express
+- Install the dependencies within the repository by entering the following into the terminal:
+    npm install
 - Start the server by entering the following into the terminal:
     npm start
 - Visit the server at http://localhost:3000
 - To close the server, enter CTRL+C into the terminal
+
+## Feature: Player Profiles Page
+The Player Profiles page lets you create a tennis player profile and search through all the players that have signed up.
+
+1. **Go to the profiles page:** Start the server and open http://localhost:3000. Click the **Find a Partner** button on the home page, or go straight to http://localhost:3000/profiles. All saved players show up as cards under **Players** at the bottom of the page.
+2. **Create a player profile:** Fill out the **Create a Profile** form. Name, age (14+), years played, and availability are required. USTA rating (1.0 - 7.0) and USTA ranking are optional, so players without a USTA rating can still sign up. Click **Create Profile** and the new player's card shows up in the list. The profile is saved to `profiles.json`, so it will still be there after the server restarts. If something is wrong (for example a missing field or an age under 14), an alert pops up with the error and nothing gets saved.
+3. **Search the directory:** In the **Search Players** form, type part of a name, an exact USTA rating, and/or a max USTA ranking, then click **Search**. The list updates to only show matching players. Click **Clear** to empty the search boxes, then click **Search** again to see every player (searching with no filters will just show all players).
 
 ## System Architecture
 
@@ -58,3 +65,5 @@ Database (profiles.json)
 ### Design Decisions
 
 William Bae: For handling errors in our backend, I decided to return custom success and error objects (like `{ ok: true }` or `{ ok: false, error }`) from our service file rather than throwing standard JavaScript errors and using try/catch in the controller. While using try/catch is the standard way to handle errors in Node.js, returning an object is better for our specific code because it forces us to explicitly check if a function worked (`if (!result.ok)`) before sending a response to the user. Also, a normal catch block can sometimes accidentally hide system crashes like spelling mistakes by treating them as user errors. By returning an error object on purpose, we get information as to why a validation failed without hiding bigger bugs.
+
+Edelson Garcia: For the profiles page, I decided to have `profiles.ejs` render an empty `#profiles-list` and let `app.js` fill it in by fetching the JSON from `/api/profiles`. The alternative I'd say was to have the server pass the profiles into the EJS template and loop over them with `<% profiles.forEach(...) %>` kinda like some of the earlier exercises we did in the class, which is typically seen as a normal way to do it in Express. I think that our version is a bit better because the same JSON endpoint handles both the first load and every search, so searching or creating a profile updates the list without needing to reload the whole page, and the search boxes keep what you typed making it less frustrating for the user when searching/filtering. If we rendered the list on the server, every search would need a full page refresh, and the controller would need a second path that sends back HTML on top of the JSON one that `app.js` already uses right now. The cost of this design choice is that the list depends on JavaScript, so if `app.js` fails to load the page shows the forms but no players. This in my opninion is a fair sacraftice because every modern browser typically runs JavaScript and the forms already need it to submit.
