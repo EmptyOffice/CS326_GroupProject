@@ -4,6 +4,8 @@ import profilesRouter from './routes/profiles.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.set('view engine', 'ejs');
+
 app.use(express.static('public'));
 app.use(express.json()); 
 
@@ -11,15 +13,19 @@ app.get('/', (req, res) => {
   res.send(`
     <h1>Welcome to the Pioneer Valley Tennis Matchmaker</h1>
     <p>Find local hitting partners and track court availability in the Pioneer Valley Area.</p>
-    <p>Head over to <code>/Listings</code> to find a match.</p>
+    <p>Head over to <a href="/profiles">/profiles</a> to view player profiles.</p>
   `);
 });
 
-app.get("/Matches", (req, res) => {
-  res.send("This is where you will see tennis matches near you.")
+app.get('/profiles', (req, res) => {
+  res.render('profiles');
 });
 
-app.use('/profiles', profilesRouter);
+app.get("/Matches", (req, res) => {
+  res.send("This is where tennis matches near you will go on.");
+});
+
+app.use('/api/profiles', profilesRouter);
 
 app.use((req, res) => {
   res.status(404).send('Page not found.');
