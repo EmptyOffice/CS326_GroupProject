@@ -121,3 +121,82 @@ button[type="reset"]:hover {
   border-radius: 8px;
   padding: 16px;
 }
+
+.navbar {
+  background-color: #1b5e20;
+  color: white;
+  padding: 14px 24px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.hero {
+  background-color: #2e7d32;
+  color: white;
+  text-align: center;
+  padding: 70px 20px;
+}
+
+.hero h1 {
+  font-size: 40px;
+  margin: 0 0 16px 0;
+}
+
+.hero p {
+  font-size: 18px;
+  max-width: 600px;
+  margin: 0 auto 28px auto;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 4px;
+  background-color: #c6ff00;
+  color: #1b5e20;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background-color: #aeea00;
+}
+
+.section-title {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.feature {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: 5px solid #2e7d32;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.feature h3 {
+  margin-top: 0;
+  color: #2e7d32;
+}
+
+.who {
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-size: 14px;
+}
