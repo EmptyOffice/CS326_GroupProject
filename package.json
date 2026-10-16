@@ -4,6 +4,7 @@
   "description": "| Name | GitHub Username |",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/EmptyOffice/CS326_GroupProject#readme",
   "dependencies": {
+    "ejs": "^7.0.1",
     "express": "^5.2.1"
   }
 }
