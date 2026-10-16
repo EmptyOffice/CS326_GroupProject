@@ -51,6 +51,7 @@ Services (services/profilesService.js)
 Repositories (repositories/profilesRepository.js)
   ↓ (File I/O using fs/promises)
 Database (profiles.json)
+```
 
 ### Design Decisions
 
