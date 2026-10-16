@@ -29,6 +29,13 @@ Instructions to run the server:
 
 ## System Architecture
 
+### Feature: Player Profiles API
+The backend currently exposes API for managing player profiles at the `/profiles` route. 
+
+- **Fetching Profiles:** Sending a `GET` request to `/profiles` returns a JSON array of all registered players. You can also append query parameters to filter the results (e.g., `?name=william`, `?ustaRating=4.5`, or `?ustaRanking=10`).
+- **Creating a Profile:** Sending a `POST` request to `/profiles` creates a new player. The request body must be a JSON object containing `name` (string), `age` (number, 14+), `yearsPlayed` (number, 0+), and `availability` (string). You may also optionally include `ustaRating` (1.0 - 7.0) and `ustaRanking` (positive number). 
+- **What Happens After:** The server's service layer intercepts the request to validate all fields. If the data is malformed or missing required fields, it returns a `400 Bad Request` with a descriptive error message. If the data is valid, the repository assigns the player a unique ID, saves the new profile to the `profiles.json` database, and returns a `201 Created` status containing the newly saved profile object.
+
 ### API Request Flow
 Here is the path of how client requests like fetching or creating a profile flow through our application backend:
 
