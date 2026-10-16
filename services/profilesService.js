@@ -7,8 +7,8 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
   }
 
   const parsedAge = parseInt(age, 10);
-  if (Number.isNaN(parsedAge) || parsedAge < 18) {
-    return Err({ status: 400, message: 'Age must be a valid number (18+)' });
+  if (Number.isNaN(parsedAge) || parsedAge < 14) {
+    return Err({ status: 400, message: 'Age must be a valid number (14+)' });
   }
 
   const parsedYears = parseInt(yearsPlayed, 10);
