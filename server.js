@@ -10,11 +10,7 @@ app.use(express.static('public'));
 app.use(express.json()); 
 
 app.get('/', (req, res) => {
-  res.send(`
-    <h1>Welcome to the Pioneer Valley Tennis Matchmaker</h1>
-    <p>Find local hitting partners and track court availability in the Pioneer Valley Area.</p>
-    <p>Head over to <a href="/profiles">/profiles</a> to view player profiles.</p>
-  `);
+  res.render('index');
 });
 
 app.get('/profiles', (req, res) => {
