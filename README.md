@@ -26,3 +26,25 @@ Instructions to run the server:
     npm start
 - Visit the server at http://localhost:3000
 - To close the server, enter CTRL+C into the terminal
+
+## System Architecture
+
+### API Request Flow
+Here is the path of how client requests like fetching or creating a profile flow through our application backend:
+
+```text
+Frontend (Browser) 
+  ↓ (HTTP GET / POST '/profiles')
+Routes (routes/profiles.js)
+  ↓ (asyncHandler)
+Controllers (controllers/profilesController.js)
+  ↓ (request parsing & error handling)
+Services (services/profilesService.js)
+  ↓ (data validation & search filters)
+Repositories (repositories/profilesRepository.js)
+  ↓ (File I/O using fs/promises)
+Database (profiles.json)
+
+### Design Decisions
+
+William Bae: For handling errors in our backend, I decided to return custom success and error objects (like `{ ok: true }` or `{ ok: false, error }`) from our service file rather than throwing standard JavaScript errors and using try/catch in the controller. While using try/catch is the standard way to handle errors in Node.js, returning an object is better for our specific code because it forces us to explicitly check if a function worked (`if (!result.ok)`) before sending a response to the user. Also, a normal catch block can sometimes accidentally hide system crashes like spelling mistakes by treating them as user errors. By returning an error object on purpose, we get information as to why a validation failed without hiding bigger bugs.
