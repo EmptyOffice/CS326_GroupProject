@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "William Bae",
+    "age": 22,
+    "yearsPlayed": 10,
+    "ustaRating": 4.5,
+    "availability": "Weekends and Weekday Evenings"
+  },
+  {
+    "id": 2,
+    "name": "Edelson Garcia",
+    "age": 21,
+    "yearsPlayed": 8,
+    "ustaRating": 5,
+    "availability": "Weekday Afternoons"
+  },
+  {
+    "id": 3,
+    "name": "Alexandria Anderson",
+    "age": 20,
+    "yearsPlayed": 4,
+    "ustaRating": 3.5,
+    "availability": "Sunday Mornings"
+  }
+]

@@ -1,9 +1,11 @@
 import express from 'express';
+import profilesRouter from './routes/profiles.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
+app.use(express.json()); 
 
 app.get('/', (req, res) => {
   res.send(`
@@ -13,9 +15,11 @@ app.get('/', (req, res) => {
   `);
 });
 
-app.get("/Listings", (req, res) => {
-  res.send("This is where tennis matches near you will likely go!")
+app.get("/Matches", (req, res) => {
+  res.send("This is where you will see tennis matches near you.")
 });
+
+app.use('/profiles', profilesRouter);
 
 app.use((req, res) => {
   res.status(404).send('Page not found.');
