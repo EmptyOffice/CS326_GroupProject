@@ -4,7 +4,7 @@
   "description": "| Name | GitHub Username |",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,10 @@
   },
   "homepage": "https://github.com/EmptyOffice/CS326_GroupProject#readme",
   "dependencies": {
-    "ejs": "^7.0.1",
-    "express": "^5.2.1"
+    "ejs": "^7.0.2",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2"
   }
 }
