@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import profilesRouter from './routes/profiles.js';
+import { connectDB } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +29,13 @@ app.use((req, res) => {
   res.status(404).send('Page not found.');
 });
 
-app.listen(PORT, () => {
-  console.log(`Matchmaker server is running at http://localhost:${PORT}`);
-});
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Matchmaker server is running at http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Could not connect to MongoDB:', err.message);
+    process.exit(1);
+  });
