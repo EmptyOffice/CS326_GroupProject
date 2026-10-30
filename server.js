@@ -29,6 +29,11 @@ app.use((req, res) => {
   res.status(404).send('Page not found.');
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('An internal server error occurred');
+});
+
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
