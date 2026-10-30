@@ -1,3 +1,4 @@
-I have not used AI for this sprint. <Sprint 0, 1, 2>
-
-
+<Sprint 0> Used no AI.
+<Sprint 1> Used no AI.
+<Sprint 2> Used no AI.
+<Sprint 3> Used no AI.
