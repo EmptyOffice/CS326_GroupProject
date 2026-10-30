@@ -1,16 +1,26 @@
-import { readFile, writeFile } from 'fs/promises';
-
-const DATA_FILE = 'profiles.json';
+import mongoose from 'mongoose';
+import { Profile } from '../models/Profile.js';
 
 export const getAll = async () => {
-  try {
-    const data = await readFile(DATA_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    return [];
-  }
+  return Profile.find().sort({ createdAt: 1 }).lean();
 };
 
-export const save = async (profiles) => {
-  await writeFile(DATA_FILE, JSON.stringify(profiles, null, 2));
+export const findById = async (id) => {
+  if (!mongoose.isValidObjectId(id)) return null;
+  return Profile.findById(id).lean();
+};
+
+export const create = async (data) => {
+  const profile = await Profile.create(data);
+  return profile.toObject();
+};
+
+export const updateById = async (id, data) => {
+  if (!mongoose.isValidObjectId(id)) return null;
+  return Profile.findByIdAndUpdate(id, data, { new: true, runValidators: true }).lean();
+};
+
+export const removeById = async (id) => {
+  if (!mongoose.isValidObjectId(id)) return null;
+  return Profile.findByIdAndDelete(id).lean();
 };
