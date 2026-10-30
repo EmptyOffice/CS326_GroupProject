@@ -22,5 +22,14 @@
     "yearsPlayed": 4,
     "ustaRating": 3.5,
     "availability": "Sunday Mornings"
+  },
+  {
+    "id": 4,
+    "name": "John Anderson",
+    "age": 25,
+    "yearsPlayed": 3,
+    "ustaRating": null,
+    "ustaRanking": null,
+    "availability": "Weekends"
   }
 ]
