@@ -2,11 +2,15 @@ import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('../repositories/profilesRepository.js', () => ({
   getAll: jest.fn(),
-  save: jest.fn((data) => ({ _id: 'fake-id', ...data })),
+  findById: jest.fn(),
+  create: jest.fn((data) => ({ _id: 'fake-id', ...data })),
+  updateById: jest.fn(),
+  save: jest.fn((data) => ({ _id: 'fake-id', ...data })), // can be removed after db
+  removeById: jest.fn(),
 }));
 
 const { createProfile, listProfiles } = await import('../services/profilesService.js');
-const { getAll } = await import('../repositories/entriesRepository.js');
+const { getAll } = await import('../repositories/profilesRepository.js');
 
 test('createProfile rejects a missing name field', async () => {
   const result = await createProfile({ name: '', age: '20', yearsPlayed: '3', availability: 'Weekdays' });
@@ -60,11 +64,10 @@ test('createProfile saves a valid profile and returns it', async () => {
 });
 
 test('listProfiles returns profiles sorted alphabetically by name', async () => {
-  getAll.mockResolvedValueOnce([
+  const result = await listProfiles(getAll.mockResolvedValueOnce([
     { _id: '1', name: 'C', age: '19', yearsPlayed: '4', availability: 'Weekdays' },
     { _id: '2', name: 'B', age: '20', yearsPlayed: '5', availability: 'Weekends' },
     { _id: '3', name: 'A', age: '21', yearsPlayed: '3', availability: 'Weekday Afternoons' },
-  ]);
-  const result = await listProfiles();
-  expect(result.map((profile) => profile.name)).toEqual(['A', 'B', 'C']);
+  ]));
+  expect(result.value.map((profile) => profile.name)).toEqual(['A', 'B', 'C']);
 });
