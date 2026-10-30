@@ -27,6 +27,11 @@ app.use((req, res) => {
   res.status(404).send('Page not found.');
 });
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('An internal server error occurred');
+});
+
 app.listen(PORT, () => {
   console.log(`Matchmaker server is running at http://localhost:${PORT}`);
 });
