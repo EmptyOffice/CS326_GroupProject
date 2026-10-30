@@ -1,5 +1,5 @@
 import { Ok, Err } from '../result.js';
-import { getAll, save } from '../repositories/profilesRepository.js';
+import { getAll, create } from '../repositories/profilesRepository.js';
 
 const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, availability }) => {
   if (!name || !age || !yearsPlayed || !availability) {
@@ -46,17 +46,7 @@ export const createProfile = async (data) => {
   const result = validateProfile(data);
   if (!result.ok) return result;
 
-  const profiles = await getAll();
-  const maxId = profiles.length > 0 ? Math.max(...profiles.map(p => p.id)) : 0;
-  
-  const newProfile = {
-    id: maxId + 1,
-    ...result.value
-  };
-
-  profiles.push(newProfile);
-  await save(profiles);
-  
+  const newProfile = await create(result.value);
   return Ok(newProfile);
 };
 
