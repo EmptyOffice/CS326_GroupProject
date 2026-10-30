@@ -4,7 +4,7 @@ import { asyncHandler } from '../asynchandler.js';
 
 const router = Router();
 
-router.get('/', asyncHandler(profilesController.index)); 
+router.get('/', asyncHandler(profilesController.index));
 
 router.post('/', asyncHandler(profilesController.create));
 
