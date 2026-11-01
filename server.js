@@ -31,7 +31,7 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('An internal server error occurred');
+  res.status(err.status || 500).send('An internal server error occurred');
 });
 
 connectDB()

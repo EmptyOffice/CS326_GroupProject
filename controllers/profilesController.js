@@ -4,10 +4,10 @@ export const index = async (req, res) => {
   const result = await listProfiles(req.query);
   
   if (!result.ok) {
-    return res.status(400).json({ error: result.error.message });
+    return res.status(400).send(`<div class="text-red-500">${result.error.message}</div>`);
   }
   
-  res.json(result.value);
+  res.render('partials/profile-list', { profiles: result.value });
 };
 
 export const create = async (req, res) => {
