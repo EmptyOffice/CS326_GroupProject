@@ -1,5 +1,5 @@
 import { Ok, Err } from '../result.js';
-import { getAll, create } from '../repositories/profilesRepository.js';
+import { getAll, create, removeById } from '../repositories/profilesRepository.js';
 
 const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, availability }) => {
   if (!name || !age || !yearsPlayed || !availability) {
@@ -69,4 +69,13 @@ export const listProfiles = async (filters) => {
   }
 
   return Ok(profiles); 
+};
+
+export const removeProfile = async (id) => {
+  try {
+    await removeById(id);
+    return Ok({ success: true });
+  } catch (error) {
+    return Err({ status: 500, message: 'Failed to delete from database' });
+  }
 };
