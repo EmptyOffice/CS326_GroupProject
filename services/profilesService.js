@@ -1,5 +1,5 @@
 import { Ok, Err } from '../result.js';
-import { getAll, save } from '../repositories/profilesRepository.js';
+import { getAll, create, removeById } from '../repositories/profilesRepository.js';
 
 const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, availability }) => {
   if (!name || !age || !yearsPlayed || !availability) {
@@ -32,13 +32,13 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
     }
   }
 
-  return Ok({ 
-    name: name.trim(), 
-    age: parsedAge, 
+  return Ok({
+    name: name.trim(),
+    age: parsedAge,
     yearsPlayed: parsedYears,
-    ustaRating: parsedRating, 
-    ustaRanking: parsedRanking, 
-    availability: availability.trim() 
+    ustaRating: parsedRating,
+    ustaRanking: parsedRanking,
+    availability: availability.trim()
   });
 };
 
@@ -46,22 +46,12 @@ export const createProfile = async (data) => {
   const result = validateProfile(data);
   if (!result.ok) return result;
 
-  const profiles = await getAll();
-  const maxId = profiles.length > 0 ? Math.max(...profiles.map(p => p.id)) : 0;
-  
-  const newProfile = {
-    id: maxId + 1,
-    ...result.value
-  };
-
-  profiles.push(newProfile);
-  await save(profiles);
-  
+  const newProfile = await create(result.value);
   return Ok(newProfile);
 };
 
 export const listProfiles = async (filters) => {
-  let profiles = await getAll(); 
+  let profiles = await getAll();
 
   if (filters.name) {
     const searchString = filters.name.toLowerCase();
@@ -78,5 +68,14 @@ export const listProfiles = async (filters) => {
     profiles = profiles.filter(p => p.ustaRanking > 0 && p.ustaRanking <= maxRanking);
   }
 
-  return Ok(profiles); 
+  return Ok(profiles);
+};
+
+export const removeProfile = async (id) => {
+  try {
+    await removeById(id);
+    return Ok({ success: true });
+  } catch (error) {
+    return Err({ status: 500, message: 'Failed to delete from database' });
+  }
 };

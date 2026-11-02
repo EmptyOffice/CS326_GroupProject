@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import profilesRouter from './routes/profiles.js';
+import { connectDB } from './db.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -7,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-app.use(express.json()); 
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -29,9 +31,16 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('An internal server error occurred');
+  res.status(err.status || 500).send('An internal server error occurred');
 });
 
-app.listen(PORT, () => {
-  console.log(`Matchmaker server is running at http://localhost:${PORT}`);
-});
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Matchmaker server is running at http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Could not connect to MongoDB:', err.message);
+    process.exit(1);
+  });

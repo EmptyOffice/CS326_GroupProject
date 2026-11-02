@@ -1,13 +1,13 @@
-import { listProfiles, createProfile } from '../services/profilesService.js';
+import { listProfiles, createProfile, removeProfile } from '../services/profilesService.js';
 
 export const index = async (req, res) => {
   const result = await listProfiles(req.query);
   
   if (!result.ok) {
-    return res.status(400).json({ error: result.error.message });
+    return res.status(400).send(`<div class="text-red-500">${result.error.message}</div>`);
   }
   
-  res.json(result.value);
+  res.render('partials/profile-list', { profiles: result.value });
 };
 
 export const create = async (req, res) => {
@@ -18,4 +18,15 @@ export const create = async (req, res) => {
   }
   
   res.status(201).json(result.value);
+};
+
+export const deleteProfile = async (req, res) => {
+  const result = await removeProfile(req.params.id);
+  
+  if (!result.ok) {
+    console.error("Delete error:", result.error);
+    return res.status(500).send('<div class="text-red-500">Failed to delete</div>');
+  }
+  
+  res.send(''); 
 };
