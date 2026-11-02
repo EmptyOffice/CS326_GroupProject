@@ -8,4 +8,6 @@ router.get('/', asyncHandler(profilesController.index));
 router.get('/search', asyncHandler(profilesController.index));
 router.post('/', asyncHandler(profilesController.create));
 
+router.delete('/:id', asyncHandler(profilesController.deleteProfile)); 
+
 export default router;

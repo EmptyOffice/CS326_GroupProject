@@ -1,5 +1,5 @@
 import { listProfiles, createProfile } from '../services/profilesService.js';
-
+import { Profile } from '../models/Profile.js'; 
 export const index = async (req, res) => {
   const result = await listProfiles(req.query);
   
@@ -18,4 +18,14 @@ export const create = async (req, res) => {
   }
   
   res.status(201).json(result.value);
+};
+
+export const deleteProfile = async (req, res) => {
+  try {
+    await Profile.findByIdAndDelete(req.params.id);
+    res.send(''); 
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).send('<div class="text-red-500">Failed to delete</div>');
+  }
 };
