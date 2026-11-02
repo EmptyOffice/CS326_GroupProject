@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 jest.unstable_mockModule('../repositories/profilesRepository.js', () => ({
   getAll: jest.fn(),
   findById: jest.fn(),
-  create: jest.fn((data) => ({ _id: 'fake-id', ...data })),
+  create: jest.fn((data) => ({ id: 'fake-id', ...data })),
   updateById: jest.fn(),
   removeById: jest.fn(),
 }));
@@ -59,7 +59,7 @@ test('createProfile rejects a ustaRanking value below 0', async () => {
 test('createProfile saves a valid profile and returns it', async () => {
   const result = await createProfile({ name: 'D', age: '22', yearsPlayed: '1', availability: 'Sunday Mornings' });
   expect(result.ok).toBe(true);
-  expect(result.value).toEqual({ id: 'fake-id', name: 'D', age: '22', yearsPlayed: '1', availability: 'Sunday Mornings' });
+  expect(result.value).toEqual({ id: 'fake-id', name: 'D', age: 22, yearsPlayed: 1, ustaRanking: null, ustaRating: null, availability: 'Sunday Mornings' });
 });
 
 test('listProfiles returns profiles sorted alphabetically by name', async () => {
