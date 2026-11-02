@@ -1,27 +1,15 @@
 {
-  "name": "cs326_groupproject",
-  "version": "1.0.0",
-  "description": "| Name | GitHub Username |",
-  "main": "index.js",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:css": "npx @tailwindcss/cli -i ./src/input.css -o ./public/style.css"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EmptyOffice/CS326_GroupProject.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/EmptyOffice/CS326_GroupProject/issues"
-  },
-  "homepage": "https://github.com/EmptyOffice/CS326_GroupProject#readme",
   "dependencies": {
     "dotenv": "^18.0.9",
-    "ejs": "^7.0.1",
-    "express": "^5.2.1",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
     "mongoose": "^9.11.4"
   }
 }
