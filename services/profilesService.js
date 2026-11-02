@@ -50,7 +50,7 @@ export const createProfile = async (data) => {
   return Ok(newProfile);
 };
 
-export const listProfiles = async (filters) => {
+export const listProfiles = async (filters = {}) => {
   let profiles = await getAll();
 
   if (filters.name) {
@@ -68,6 +68,7 @@ export const listProfiles = async (filters) => {
     profiles = profiles.filter(p => p.ustaRanking > 0 && p.ustaRanking <= maxRanking);
   }
 
+  profiles.sort((a, b) => a.name.localeCompare(b.name));
   return Ok(profiles);
 };
 

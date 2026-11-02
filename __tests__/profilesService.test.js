@@ -5,7 +5,6 @@ jest.unstable_mockModule('../repositories/profilesRepository.js', () => ({
   findById: jest.fn(),
   create: jest.fn((data) => ({ _id: 'fake-id', ...data })),
   updateById: jest.fn(),
-  save: jest.fn((data) => ({ _id: 'fake-id', ...data })), // can be removed after db
   removeById: jest.fn(),
 }));
 
@@ -64,10 +63,11 @@ test('createProfile saves a valid profile and returns it', async () => {
 });
 
 test('listProfiles returns profiles sorted alphabetically by name', async () => {
-  const result = await listProfiles(getAll.mockResolvedValueOnce([
+  getAll.mockResolvedValueOnce([
     { _id: '1', name: 'C', age: '19', yearsPlayed: '4', availability: 'Weekdays' },
     { _id: '2', name: 'B', age: '20', yearsPlayed: '5', availability: 'Weekends' },
     { _id: '3', name: 'A', age: '21', yearsPlayed: '3', availability: 'Weekday Afternoons' },
-  ]));
+  ]);
+  const result = await listProfiles();
   expect(result.value.map((profile) => profile.name)).toEqual(['A', 'B', 'C']);
 });
