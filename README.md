@@ -50,7 +50,7 @@ The backend currently exposes API for managing player profiles at the `/profiles
 ### API Request Flow
 Here is the path of how client requests like fetching or creating a profile flow through our application backend:
 
-![System Diagram](./cs326_proj_diagram.png)
+![System Diagram](./326_diagram.png)
 
 
 ### Design Decisions
