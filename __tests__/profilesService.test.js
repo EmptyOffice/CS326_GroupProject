@@ -8,8 +8,8 @@ jest.unstable_mockModule('../repositories/profilesRepository.js', () => ({
   removeById: jest.fn(),
 }));
 
-const { createProfile, listProfiles } = await import('../services/profilesService.js');
-const { getAll } = await import('../repositories/profilesRepository.js');
+const { createProfile, listProfiles, removeProfile } = await import('../services/profilesService.js');
+const { getAll, removeById } = await import('../repositories/profilesRepository.js');
 
 test('createProfile rejects a missing name field', async () => {
   const result = await createProfile({ name: '', age: '20', yearsPlayed: '3', availability: 'Weekdays' });
@@ -70,4 +70,18 @@ test('listProfiles returns profiles sorted alphabetically by name', async () => 
   ]);
   const result = await listProfiles();
   expect(result.value.map((profile) => profile.name)).toEqual(['A', 'B', 'C']);
+});
+
+test('removeProfile successfully deletes a given profile', async () => {
+  const profile = { id: 'fake-id' };
+  removeById.mockResolvedValueOnce(profile);
+  const result = await removeProfile(profile.id);
+  expect(result.ok).toBe(true);
+});
+
+test('removeProfile throws an error when deletion fails', async () => {
+  removeById.mockRejectedValueOnce(new Error('Failed to delete from database'));
+  const result = await removeProfile('fake-id');
+  expect(result.ok).toBe(false);
+  expect(result.error.message).toBe('Failed to delete from database');
 });
