@@ -7,16 +7,16 @@
 
 Local Tennis Matchmaker in the Pioneer Valley area
 - An application that connects tennis players in Amherst based on skill levels and schedule compatibility and also tracks court availability based on user input.
-- This app addresses the frustrating process of finding well-matched hitting partners and the lack of visibility into public or campus court availability with the goals of fostering a more connected and active local community. 
+- This app addresses the frustrating process of finding well-matched hitting partners and the lack of visibility into public or campus court availability with the goals of fostering a more connected and active local community.
 - Recreational tennis players, junior athletes, and campus clubs in the area can benefit from this app.
 
 Working agreement:
 - We will communicate using Discord.
 - "Done" for a PR means passing review from at least one teammate.
-- We will resolve disagreements by discussing in person and voting at the end. 
-- We will meet on Fridays at 1:20pm weekly. 
+- We will resolve disagreements by discussing in person and voting at the end.
+- We will meet on Fridays at 1:20pm weekly.
 
-Instructions to run the server: 
+Instructions to run the server:
 - Clone the repository: `git clone https://github.com/EmptyOffice/CS326_GroupProject.git`
 - Navigate into the directory: `cd CS326_GroupProject`
 - Install dependencies: `npm install`
@@ -41,10 +41,10 @@ The Player Profiles page lets you create a tennis player profile and search thro
 ## System Architecture
 
 ### Feature: Player Profiles API
-The backend currently exposes API for managing player profiles at the `/profiles` route. 
+The backend currently exposes API for managing player profiles at the `/profiles` route.
 
 - **Fetching Profiles:** Sending a `GET` request to `/profiles` returns an HTML partial (via EJS) of all registered players, designed to be swapped directly into the DOM using HTMX. You can also append query parameters to filter the results (e.g., `?name=william`, `?ustaRating=4.5`, or `?ustaRanking=10`).
-- **Creating a Profile:** Sending a `POST` request to `/profiles` creates a new player. The request body must be a JSON object containing `name` (string), `age` (number, 14+), `yearsPlayed` (number, 0+), and `availability` (string). You may also optionally include `ustaRating` (1.0 - 7.0) and `ustaRanking` (positive number). 
+- **Creating a Profile:** Sending a `POST` request to `/profiles` creates a new player. The request body must be a JSON object containing `name` (string), `age` (number, 14+), `yearsPlayed` (number, 0+), and `availability` (string). You may also optionally include `ustaRating` (1.0 - 7.0) and `ustaRanking` (positive number).
 - **What Happens After:** The server's service layer intercepts the request to validate all fields. If the data is malformed or missing required fields, it returns a `400 Bad Request` with a descriptive error message. If the data is valid, the repository assigns the player a unique ID, saves the new profile to MongoDB, and returns a `201 Created` status containing the newly saved profile object.
 
 ### API Request Flow
@@ -61,4 +61,6 @@ William Bae (Sprint 3): When implementing HTMX for our search filter, I chose to
 
 Edelson Garcia: For the profiles page, I decided to have `profiles.ejs` render an empty `#profiles-list` and let `app.js` fill it in by fetching the JSON from `/api/profiles`. The alternative I'd say was to have the server pass the profiles into the EJS template and loop over them with `<% profiles.forEach(...) %>` kinda like some of the earlier exercises we did in the class, which is typically seen as a normal way to do it in Express. I think that our version is a bit better because the same JSON endpoint handles both the first load and every search, so searching or creating a profile updates the list without needing to reload the whole page, and the search boxes keep what you typed making it less frustrating for the user when searching/filtering. If we rendered the list on the server, every search would need a full page refresh, and the controller would need a second path that sends back HTML on top of the JSON one that `app.js` already uses right now. The cost of this design choice is that the list depends on JavaScript, so if `app.js` fails to load the page shows the forms but no players. This in my opninion is a fair sacraftice because every modern browser typically runs JavaScript and the forms already need it to submit.
 
-Alexandria Anderson: For the client-side logic, I opted to ensure that USTA ratings and rankings are optional attributes by providing a default value for them when left unprovided. I chose to have these attributes contain a default "Unrated/Unranked" value in the case they were left unfilled. Alternatively, I could have filled these defaults with blank space, or made them undefined and passed them over to an if-else case that builds the player profile without these attributes entirely. However, the latter leads to a lack of consistency within the code and a need for further individual testing (in addition to the default profile with all fields present, 3 extra variations: missing unrated, unranked, or both). While this may keep the profiles as specific as possible, it might also hinder the simplicity of the code in the long run when these profiles may need to be passed to different functions and used elsewhere, as they'll also need to accommodate for multiple variations. Making the default value blank would remove the issue of needing further variations, but may confuse the user with its lack of clarity on why there is no value present. On the other hand, the option I chose avoids both of these potential issues while keeping both the code itself and what the user sees on the page clear and explicit about what information is and isn't present for each player.
+Alexandria Anderson (Sprint 2): For the client-side logic, I opted to ensure that USTA ratings and rankings are optional attributes by providing a default value for them when left unprovided. I chose to have these attributes contain a default "Unrated/Unranked" value in the case they were left unfilled. Alternatively, I could have filled these defaults with blank space, or made them undefined and passed them over to an if-else case that builds the player profile without these attributes entirely. However, the latter leads to a lack of consistency within the code and a need for further individual testing (in addition to the default profile with all fields present, 3 extra variations: missing unrated, unranked, or both). While this may keep the profiles as specific as possible, it might also hinder the simplicity of the code in the long run when these profiles may need to be passed to different functions and used elsewhere, as they'll also need to accommodate for multiple variations. Making the default value blank would remove the issue of needing further variations, but may confuse the user with its lack of clarity on why there is no value present. On the other hand, the option I chose avoids both of these potential issues while keeping both the code itself and what the user sees on the page clear and explicit about what information is and isn't present for each player.
+
+Alexandria Anderson (Sprint 3): I decided to use Jest's unstable_mockModule to implement unit tests that mock the repository layer rather than implement integration tests that interact with MongoDB and the repository directly. Although integration testing could guarantee the most accuracy by testing the code directly without emulating anything, and may be able to catch errors and interact with behavior specifically related to the database itself, since we are only using a specific part of MongoDB, I found it more practical to implement unit tests that simply mock the environment. Additionally, since we're only checking the business logic from profilesService with these tests, I would even say it's more effective to isolate these functions from how they interact with the database, in order to be able to test the logic itself. Also, mocking the repository means nothing within the repository layer will actually be affected, meaning there will be no changes made to any of the actual information stored in the database, and no data left behind to clean up after testing.

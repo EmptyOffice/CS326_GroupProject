@@ -32,13 +32,13 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
     }
   }
 
-  return Ok({ 
-    name: name.trim(), 
-    age: parsedAge, 
+  return Ok({
+    name: name.trim(),
+    age: parsedAge,
     yearsPlayed: parsedYears,
-    ustaRating: parsedRating, 
-    ustaRanking: parsedRanking, 
-    availability: availability.trim() 
+    ustaRating: parsedRating,
+    ustaRanking: parsedRanking,
+    availability: availability.trim()
   });
 };
 
@@ -50,8 +50,8 @@ export const createProfile = async (data) => {
   return Ok(newProfile);
 };
 
-export const listProfiles = async (filters) => {
-  let profiles = await getAll(); 
+export const listProfiles = async (filters = {}) => {
+  let profiles = await getAll();
 
   if (filters.name) {
     const searchString = filters.name.toLowerCase();
@@ -68,7 +68,8 @@ export const listProfiles = async (filters) => {
     profiles = profiles.filter(p => p.ustaRanking > 0 && p.ustaRanking <= maxRanking);
   }
 
-  return Ok(profiles); 
+  profiles.sort((a, b) => a.name.localeCompare(b.name));
+  return Ok(profiles);
 };
 
 export const removeProfile = async (id) => {
