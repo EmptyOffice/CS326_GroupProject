@@ -62,8 +62,7 @@ Content-Type: application/json; charset=utf-8
 
 {"status":"ok","uptime":42,"timestamp":"2026-11-17T05:18:59.379Z"}
 
-It lives in routes/health.js and is mounted in server.js before any other middleware, so the upcoming session/auth middleware can never block it.
-
+It lives in routes/health.js and is mounted in server.js above the session middleware, so it never requires a login. Keep any auth middleware below this line.
 
 ### Design Decisions
 
