@@ -79,7 +79,7 @@ createForm.addEventListener("submit", async (event) => {
         htmx.ajax('GET', '/api/profiles/search', { target: '#profiles-list', swap: 'innerHTML' });
         
     } catch(error) {
-        alert(`Profile was not saved. ${error.message}`);
+        errorBox.textContent = `Profile was not saved. ${error.message}`;
     } finally {
         button.disabled = false;
 
