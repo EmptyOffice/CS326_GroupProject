@@ -67,8 +67,6 @@ Alexandria Anderson (Sprint 2): For the client-side logic, I opted to ensure tha
 
 Alexandria Anderson (Sprint 3): I decided to use Jest's unstable_mockModule to implement unit tests that mock the repository layer rather than implement integration tests that interact with MongoDB and the repository directly. Although integration testing could guarantee the most accuracy by testing the code directly without emulating anything, and may be able to catch errors and interact with behavior specifically related to the database itself, since we are only using a specific part of MongoDB, I found it more practical to implement unit tests that simply mock the environment. Additionally, since we're only checking the business logic from profilesService with these tests, I would even say it's more effective to isolate these functions from how they interact with the database, in order to be able to test the logic itself. Also, mocking the repository means nothing within the repository layer will actually be affected, meaning there will be no changes made to any of the actual information stored in the database, and no data left behind to clean up after testing.
 
-<<<<<<< Updated upstream
-=======
 ## Accessibility Audit (Sprint 4)
 
 We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using only the keyboard, and measured color contrast on the rendered pages (normal and hover states) with a WCAG contrast checker. The target is WCAG AA (at least 4.5:1 for text).
@@ -98,7 +96,6 @@ We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using 
 | "No profiles found" / error text (red-700) | 6.42:1 | n/a |
 | Footer text (gray-600 on gray-50) | 7.23:1 | n/a |
 
->>>>>>> Stashed changes
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:
 `npm test`
