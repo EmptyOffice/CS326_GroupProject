@@ -9,10 +9,9 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-500: oklch(63.7% 0.237 25.331);
-    --color-red-600: oklch(57.7% 0.245 27.325);
     --color-red-700: oklch(50.5% 0.213 27.518);
+    --color-red-800: oklch(44.4% 0.177 26.899);
     --color-green-100: oklch(96.2% 0.044 156.743);
-    --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
     --color-green-800: oklch(44.8% 0.119 151.328);
     --color-blue-100: oklch(93.2% 0.032 255.585);
@@ -22,8 +21,8 @@
     --color-blue-800: oklch(42.4% 0.199 265.638);
     --color-blue-900: oklch(37.9% 0.146 265.522);
     --color-gray-50: oklch(98.5% 0.002 247.839);
+    --color-gray-200: oklch(92.8% 0.006 264.531);
     --color-gray-300: oklch(87.2% 0.01 258.338);
-    --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-gray-500: oklch(55.1% 0.027 264.364);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
@@ -204,6 +203,20 @@
   }
 }
 @layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .isolate {
+    isolation: isolate;
+  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -273,6 +286,9 @@
   .max-w-6xl {
     max-width: var(--container-6xl);
   }
+  .min-w-0 {
+    min-width: 0px;
+  }
   .flex-1 {
     flex: 1;
   }
@@ -328,8 +344,8 @@
   .border-blue-500 {
     border-color: var(--color-blue-500);
   }
-  .border-gray-300 {
-    border-color: var(--color-gray-300);
+  .border-gray-500 {
+    border-color: var(--color-gray-500);
   }
   .bg-blue-100 {
     background-color: var(--color-blue-100);
@@ -349,11 +365,11 @@
   .bg-green-100 {
     background-color: var(--color-green-100);
   }
-  .bg-green-600 {
-    background-color: var(--color-green-600);
+  .bg-green-700 {
+    background-color: var(--color-green-700);
   }
-  .bg-red-500 {
-    background-color: var(--color-red-500);
+  .bg-red-700 {
+    background-color: var(--color-red-700);
   }
   .bg-white {
     background-color: var(--color-white);
@@ -463,11 +479,14 @@
   .text-red-500 {
     color: var(--color-red-500);
   }
-  .text-red-600 {
-    color: var(--color-red-600);
+  .text-red-700 {
+    color: var(--color-red-700);
   }
   .text-white {
     color: var(--color-white);
+  }
+  .lowercase {
+    text-transform: lowercase;
   }
   .shadow {
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -489,14 +508,14 @@
     .hover\:bg-blue-700:hover {
       background-color: var(--color-blue-700);
     }
-    .hover\:bg-gray-400:hover {
-      background-color: var(--color-gray-400);
+    .hover\:bg-gray-200:hover {
+      background-color: var(--color-gray-200);
     }
-    .hover\:bg-green-700:hover {
-      background-color: var(--color-green-700);
+    .hover\:bg-green-800:hover {
+      background-color: var(--color-green-800);
     }
-    .hover\:bg-red-700:hover {
-      background-color: var(--color-red-700);
+    .hover\:bg-red-800:hover {
+      background-color: var(--color-red-800);
     }
   }
   @media (width >= 48rem) {
@@ -521,6 +540,12 @@
     .md\:text-left {
       text-align: left;
     }
+  }
+}
+@layer base {
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--color-blue-700);
+    outline-offset: 2px;
   }
 }
 @property --tw-space-y-reverse {
