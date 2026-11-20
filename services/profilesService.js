@@ -1,5 +1,6 @@
 import { Ok, Err } from '../result.js';
-import { getAll, create, removeById } from '../repositories/profilesRepository.js';
+import { getAll, findById, create, removeById } from '../repositories/profilesRepository.js';
+import * as usersRepository from '../repositories/usersRepository.js';
 
 const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, availability }) => {
   if (!name || !age || !yearsPlayed || !availability) {
@@ -42,11 +43,17 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
   });
 };
 
-export const createProfile = async (data) => {
+const isOwnerOrAdmin = async (profile, actorId) => {
+  if (profile.ownerId.toString() === actorId) return true;
+  const account = await usersRepository.findById(actorId);
+  return account?.role === 'admin';
+};
+
+export const createProfile = async (data, actor) => {
   const result = validateProfile(data);
   if (!result.ok) return result;
 
-  const newProfile = await create(result.value);
+  const newProfile = await create({ ...result.value, ownerId: actor.id });
   return Ok(newProfile);
 };
 
@@ -72,11 +79,14 @@ export const listProfiles = async (filters = {}) => {
   return Ok(profiles);
 };
 
-export const removeProfile = async (id) => {
+export const removeProfile = async (id, actor) => {
   try {
+    const existing = await findById(id);
+    if(!existing) return Err({ status: 404, message: 'Profile not found' });
+    if(!(await isOwnerOrAdmin(existing, actor.id))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
     await removeById(id);
     return Ok({ success: true });
-  } catch (error) {
+  } catch(error) {
     return Err({ status: 500, message: 'Failed to delete from database' });
   }
 };
