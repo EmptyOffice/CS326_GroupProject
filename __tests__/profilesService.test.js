@@ -122,11 +122,8 @@ test('removeProfile successfully deletes a profile when attempted by an owner', 
 test('removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin', async () => {
   profilesRepository.findById.mockResolvedValueOnce({ _id: 'c1', ownerId: { toString: () => 'mock1-id' }});
   usersRepository.findById.mockResolvedValueOnce({ role: 'member' });
-  console.log('Mock user 2: ', mockUser2);
 
   const result = await removeProfile('c1', mockUser2);
-  console.log('Result: ', result);
-
   expect(usersRepository.findById).toHaveBeenCalledWith('mock2-id');
   expect(result.ok).toBe(false);
   expect(result.error.status).toBe(403);

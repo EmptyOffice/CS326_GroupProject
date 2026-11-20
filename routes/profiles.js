@@ -9,8 +9,6 @@ router.get('/', asyncHandler(profilesController.index));
 router.get('/search', asyncHandler(profilesController.index));
 router.post('/', requireLogin, asyncHandler(profilesController.create));
 
-router.delete('/:id', requireLogin, asyncHandler(profilesController.deleteProfile)); 
+router.delete('/:id', requireLogin, asyncHandler(profilesController.deleteProfile));
 
 export default router;
-
-// imported requireLogin middleware and attached it to both POST and DELETE
