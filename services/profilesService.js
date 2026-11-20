@@ -44,17 +44,14 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
 };
 
 const isOwnerOrAdmin = async (profile, actorId) => {
+  // for testing, delete later
+  console.log('Profile owner: ', profile.ownerId.toString());
+  console.log('Actor ID: ', actorId);
   if (profile.ownerId.toString() === actorId) return true;
   const account = await usersRepository.findById(actorId);
+  // delete later
+  console.log('Retrieved account: ', account);
   return account?.role === 'admin';
-};
-
-// Whether the actor is an admin. attachUser already put the role on req.user;
-// a caller without it (a test, say) gets it looked up.
-const isAdmin = async (actor) => {
-  if (!actor) return false;
-  if (actor.role) return actor.role === 'admin';
-  return (await usersRepository.findById(actor.id))?.role === 'admin';
 };
 
 export const createProfile = async (data, actor) => { // now includes actor
@@ -66,7 +63,6 @@ export const createProfile = async (data, actor) => { // now includes actor
 };
 
 export const listProfiles = async (filters = {}, actor) => {
-  const admin = await isAdmin(actor);
   let profiles = await getAll();
 
   if (filters.name) {
@@ -89,9 +85,13 @@ export const listProfiles = async (filters = {}, actor) => {
 };
 
 export const removeProfile = async (id, actor) => { // adds actor
-  const existing = await findById(id);
-  if(!existing) return Err({ status: 404, message: 'Profile not found' });
-  if(!(await isOwnerOrAdmin(existing, actor.id))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
-  await removeById(id);
-  return Ok({ success: true });
+  try {
+    const existing = await findById(id);
+    if(!existing) return Err({ status: 404, message: 'Profile not found' });
+    if(!(await isOwnerOrAdmin(existing, actor.id))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
+    await removeById(id);
+    return Ok({ success: true });
+  } catch(error) {
+    return Err({ status: 500, message: 'Failed to delete from database' });
+  }
 };
