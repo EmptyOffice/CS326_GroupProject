@@ -6,7 +6,8 @@ const profileSchema = new mongoose.Schema({
   yearsPlayed: { type: Number, required: true, min: 0 },
   availability: { type: String, required: true, trim: true },
   ustaRating: { type: Number, min: 1, max: 7, default: null },
-  ustaRanking: { type: Number, min: 1, default: null }
+  ustaRanking: { type: Number, min: 1, default: null },
+  ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // new
 }, { timestamps: true });
 
 export const Profile = mongoose.model('Profile', profileSchema);
