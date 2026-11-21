@@ -36,6 +36,16 @@ app.get('/profiles', (req, res) => {
   res.render('profiles');
 });
 
+app.get('/signup', (req, res) => {
+  if (req.session.user) return res.redirect('/profiles');
+  res.render('signup');
+});
+
+app.get('/login', (req, res) => {
+  if (req.session.user) return res.redirect('/profiles');
+  res.render('login');
+});
+
 app.get("/Matches", (req, res) => {
   res.send("This is where tennis matches near you will go on.");
 });
