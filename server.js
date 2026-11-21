@@ -3,6 +3,7 @@ import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import profilesRouter from './routes/profiles.js';
+import healthRouter from './routes/health.js';
 import authRouter from './routes/auth.js';
 import { connectDB, MONGO_URL } from './db.js';
 
@@ -10,6 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
+
+app.use('/health', healthRouter);
 
 app.use(express.static('public'));
 app.use(express.json());

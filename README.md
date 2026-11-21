@@ -52,6 +52,17 @@ Here is the path of how client requests like fetching or creating a profile flow
 
 ![System Diagram](./326_diagram_sprint3_fixed.png)
 
+### Health Check
+
+GET /health is a public endpoint for deployment monitoring. It needs no login, cookie, or token, and always returns 200 OK with JSON:
+
+$ curl -i http://localhost:3000/health
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+
+{"status":"ok","uptime":42,"timestamp":"2026-11-17T05:18:59.379Z"}
+
+It lives in routes/health.js and is mounted in server.js above the session middleware, so it never requires a login. Keep any auth middleware below this line.
 
 ### Design Decisions
 
