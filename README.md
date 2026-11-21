@@ -67,6 +67,35 @@ Alexandria Anderson (Sprint 2): For the client-side logic, I opted to ensure tha
 
 Alexandria Anderson (Sprint 3): I decided to use Jest's unstable_mockModule to implement unit tests that mock the repository layer rather than implement integration tests that interact with MongoDB and the repository directly. Although integration testing could guarantee the most accuracy by testing the code directly without emulating anything, and may be able to catch errors and interact with behavior specifically related to the database itself, since we are only using a specific part of MongoDB, I found it more practical to implement unit tests that simply mock the environment. Additionally, since we're only checking the business logic from profilesService with these tests, I would even say it's more effective to isolate these functions from how they interact with the database, in order to be able to test the logic itself. Also, mocking the repository means nothing within the repository layer will actually be affected, meaning there will be no changes made to any of the actual information stored in the database, and no data left behind to clean up after testing.
 
+## Accessibility Audit (Sprint 4)
+
+We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using only the keyboard, and measured color contrast on the rendered pages (normal and hover states) with a WCAG contrast checker. The target is WCAG AA (at least 4.5:1 for text).
+
+### Fixes
+
+| # | Area | What we found | What we fixed | How to check |
+|---|---|---|---|---|
+| 1 | Keyboard | Every link, button and input could be reached with Tab, but the focus indicator was only the browser's thin default outline, which is hard to see on the blue and green buttons. | Added one consistent 3px blue focus ring for all links, buttons, inputs and focusable headings (`:focus-visible` rule in `src/input.css`). It only shows for keyboard users, not mouse clicks. | Press Tab through each page. Every control gets a thick blue outline, in top-to-bottom order: search fields, Search, Clear, the six create fields, Create Profile, then each card's Delete button. |
+| 2 | Focus after delete | Deleting a card removed the Delete button that had focus, so focus fell back to the top of the page (`<body>`). | `public/app.js` remembers the card's neighbor before HTMX removes it, then moves focus to the next card's Delete button (or the previous one if it was the last card, or the "Players" heading if the list is now empty). | Tab to a Delete button in the middle of the list and press Enter. Focus lands on the next card's Delete button. Delete every card and focus lands on the "Players" heading. |
+| 3 | Focus after create | Disabling the Create Profile button while saving dropped focus to `<body>`. Errors appeared in an `alert()` pop-up. | Focus returns to the Create Profile button after saving. Errors now appear inline under the form in a `role="alert"` box that screen readers read out. | Fill the form with the keyboard and press Enter on Create Profile. Focus stays on the button. Submit with a required field empty to see the inline error. |
+| 4 | Screen reader updates | Search results, new profiles and deletions changed the page silently, so screen reader users got no feedback. | Added a hidden live region (`#status`, `aria-live="polite"`) that announces "3 players found.", "No players found.", "Profile created for ...", "... deleted." and "Could not delete ..." | With a screen reader on (VoiceOver: Cmd+F5, NVDA on Windows), run a search or delete a card and listen for the announcement. Or watch the `#status` element in DevTools. |
+| 5 | Labels | The three search inputs (name, rating, ranking) had only placeholder text and no `<label>`. | Added a `<label for>` for each search input (visually hidden with `sr-only`, so the layout is unchanged). The six create-form inputs already had visible labels. Delete buttons now say which player they delete (`aria-label="Delete <name>"`). | In DevTools, inspect a search input: the Accessibility pane shows its name ("Search by name", etc.). With a screen reader, Tab to a Delete button and it reads "Delete Alice Kim". |
+| 6 | Contrast | Measured on the rendered page: Create Profile button 3.22:1, Delete button 3.81:1, Clear button on hover 3.96:1, "No profiles found" text 3.81:1. All below 4.5:1. | Create Profile: `green-700` (hover `green-800`). Delete: `red-700` (hover `red-800`). Clear: hover lightens to `gray-200` with `gray-800` text. "No profiles found" and form errors: `red-700`. Footer text darkened to `gray-600`. Input borders darkened to `gray-500` so the fields are visible. | Use a contrast checker (e.g. the WebAIM Contrast Checker, or the contrast ratio in Chrome DevTools' color picker) on each item, including while hovering. |
+
+### Contrast after the fixes (measured on the rendered page)
+
+| Element | Normal | Hover |
+|---|---|---|
+| Search button (white on blue-600 / blue-700) | 5.25:1 | 6.83:1 |
+| Clear button (gray-800 on gray-300 / gray-200) | 9.96:1 | 11.85:1 |
+| Create Profile button (white on green-700 / green-800) | 4.95:1 | 7.13:1 |
+| Delete button (white on red-700 / red-800) | 6.42:1 | 8.36:1 |
+| "Find a Partner" link (white on blue-600 / blue-700) | 5.25:1 | 6.83:1 |
+| Card body text (gray-600 on white) | 7.56:1 | n/a |
+| Availability text (gray-500 on white) | 4.84:1 | n/a |
+| "No profiles found" / error text (red-700) | 6.42:1 | n/a |
+| Footer text (gray-600 on gray-50) | 7.23:1 | n/a |
+
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:
 `npm test`
