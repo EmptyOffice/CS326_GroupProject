@@ -25,7 +25,7 @@ export const deleteProfile = async (req, res) => {
 
   if (!result.ok) {
     console.error("Delete error:", result.error);
-    return res.status(500).send('<div class="text-red-500">Failed to delete</div>');
+    return res.status(result.error.status || 500).send('<div class="text-red-700">Could not delete this profile.</div>');;
   }
 
   res.status(200).send('');

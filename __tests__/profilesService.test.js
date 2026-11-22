@@ -14,7 +14,7 @@ jest.unstable_mockModule('../repositories/usersRepository.js', () => ({
   create: jest.fn(),
 }));
 
-const { createProfile, listProfiles, removeProfile, findById } = await import('../services/profilesService.js');
+const { createProfile, listProfiles, removeProfile } = await import('../services/profilesService.js');
 const { getAll, removeById } = await import('../repositories/profilesRepository.js');
 const profilesRepository = await import('../repositories/profilesRepository.js');
 const usersRepository = await import('../repositories/usersRepository.js');
@@ -22,6 +22,8 @@ const usersRepository = await import('../repositories/usersRepository.js');
 const mockUser1 = { id: 'mock1-id' };
 const mockUser2 = { id: 'mock2-id' };
 const admin = { id: 'admin-id' };
+
+// NOTE: Since old profiles can only be deleted by an admin, test data needs to be cleared, or make-admin has to be used.
 
 beforeEach(() => {
   jest.resetAllMocks();
