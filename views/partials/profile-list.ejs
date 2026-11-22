@@ -1,8 +1,8 @@
 <% if (profiles.length === 0) { %>
-  <li class="p-4 bg-white rounded-lg shadow text-red-500 font-bold">No profiles found matching your search.</li>
+  <li class="p-4 bg-white rounded-lg shadow text-red-700 font-bold">No profiles found matching your search.</li>
 <% } else { %>
   <% profiles.forEach(profile => { %>
-    <li class="p-4 bg-white rounded-lg shadow border-l-4 border-blue-500 flex flex-col md:flex-row justify-between md:items-center">
+    <li data-profile-id="<%= profile._id %>" class="p-4 bg-white rounded-lg shadow border-l-4 border-blue-500 flex flex-col md:flex-row justify-between md:items-center">
       <div>
         <h3 class="text-xl font-bold text-gray-800"><%= profile.name %></h3>
         <p class="text-gray-600">Age: <%= profile.age %> | Years Played: <%= profile.yearsPlayed %></p>
@@ -17,10 +17,12 @@
         <% } %>
         
         <button 
+          type="button"
           hx-delete="/api/profiles/<%= profile._id %>" 
           hx-target="closest li" 
           hx-swap="outerHTML" 
-          class="bg-red-500 hover:bg-red-700 text-white text-xs font-bold py-1 px-3 rounded mt-2 transition">
+          aria-label="Delete <%= profile.name %>"
+          class="delete-btn bg-red-700 hover:bg-red-800 text-white text-xs font-bold py-1 px-3 rounded mt-2 transition">
           Delete
         </button>
       </div>

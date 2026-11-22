@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In - PV Tennis</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/auth.js" defer></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <%- include('partials/nav') %>
+
+  <main class="max-w-md mx-auto px-4 py-12">
+    <section class="bg-white p-6 rounded-lg shadow-md">
+      <h1 class="text-2xl font-bold mb-4">Log In</h1>
+      <form id="auth-form" action="/auth/login" method="post" class="space-y-4">
+        <div>
+          <label for="email" class="block font-bold mb-1">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required class="w-full border border-gray-500 p-2 rounded">
+        </div>
+
+        <div>
+          <label for="password" class="block font-bold mb-1">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required class="w-full border border-gray-500 p-2 rounded">
+        </div>
+
+        <p id="auth-error" role="alert" class="text-red-700 font-bold"></p>
+
+        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Log In</button>
+      </form>
+      <p class="mt-4 text-gray-600">Don't have an account? <a href="/signup" class="text-blue-700 underline">Sign up</a></p>
+    </section>
+  </main>
+</body>
+</html>
