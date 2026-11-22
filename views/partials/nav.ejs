@@ -1,0 +1,13 @@
+<nav class="bg-blue-600 text-white p-4 shadow-md flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+  <a href="/" class="text-xl font-bold">PV Tennis</a>
+  <div class="flex flex-wrap items-center gap-4">
+    <a href="/profiles" class="hover:underline">Players</a>
+    <% if (user) { %>
+      <span>Logged in as <%= user.email %></span>
+      <button type="button" id="logout-btn" class="bg-white text-blue-700 font-bold py-1 px-3 rounded hover:bg-blue-100">Log out</button>
+    <% } else { %>
+      <a href="/login" class="hover:underline">Log in</a>
+      <a href="/signup" class="bg-white text-blue-700 font-bold py-1 px-3 rounded hover:bg-blue-100">Sign up</a>
+    <% } %>
+  </div>
+</nav>

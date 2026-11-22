@@ -96,6 +96,22 @@ We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using 
 | "No profiles found" / error text (red-700) | 6.42:1 | n/a |
 | Footer text (gray-600 on gray-50) | 7.23:1 | n/a |
 
+## Accounts and Login (Sprint 4)
+Players can now make an account and log in. Accounts are saved in MongoDB and passwords are hashed with bcrypt, so the real password is never stored.
+
+1. **Set a session secret:** Copy `.env.example` to `.env` and change `SESSION_SECRET` to any long random string.
+2. **Sign up:** Click **Sign up** in the top nav or go to http://localhost:3000/signup. Enter an email and a password with at least 8 characters, then click **Create Account**. Every new account starts as a **member**.
+3. **Log in:** Click **Log in** in the nav or go to http://localhost:3000/login. Once you are logged in the nav shows your email and a **Log out** button.
+4. **Make an admin account:** Sign up normally first, then run `npm run make-admin -- you@example.com`. Log out and log back in so your session picks up the admin role.
+
+Auth routes:
+- `POST /auth/signup` creates an account and logs you in
+- `POST /auth/login` logs you in
+- `POST /auth/logout` logs you out
+- `GET /auth/me` returns the logged in user or 401 if nobody is logged in
+
+Why we went with sessions instead of tokens: our app is server rendered with EJS and HTMX, so the browser already sends a cookie with every request and we don't need any extra code on the client to attach a token. Sessions are stored in MongoDB with connect-mongo, so logging out actually ends the session on the server and it survives a server restart. The cookie is httpOnly and sameSite lax so page scripts can't read it.
+
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:
 `npm test`
