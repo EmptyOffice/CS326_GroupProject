@@ -119,12 +119,15 @@ Why we went with sessions instead of tokens: our app is server rendered with EJS
 ## Authorization (Sprint 4)
 Profiles can only be deleted by their owner or an admin. A non-admin and/or non-owner attempting to do so will be blocked by a 403 error. This can be tested in the browser:
 
+
 1. Follow the instructions on creating an account and signing in as detailed above in **Accounts and Login**.
 2. Once you've created and logged into an account, register a profile under the /profiles page.
 3. Log out and make another account, following the same instructions as when making the first account.
 4. While logged into the new account, check the /profiles page. Under the list of players, it should not be possible to delete the profile created under the first account.
 
+
 Additionally, three new tests have been implemented for these new authorization rules: "removeProfile successfully deletes a profile when attempted by an admin", "removeProfile successfully deletes a profile when attempted by an owner", and "removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin". To run these tests, enter `npm test` in the terminal as detailed in **Testing** below, and they will be included as part of the test suite.
+
 
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:
