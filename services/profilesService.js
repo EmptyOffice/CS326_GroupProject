@@ -43,10 +43,16 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
   });
 };
 
-const isOwnerOrAdmin = async (profile, actorId) => {
-  if (profile.ownerId.toString() === actorId) return true;
-  const account = await usersRepository.findById(actorId);
-  return account?.role === 'admin';
+const isOwnerOrAdmin = async (profile, actor) => {
+  if(!actor?.id) return false;
+
+  const isOwner = profile.ownerId?.toString() === actor.id.toString();
+  if(isOwner) return true;
+
+  const account = await usersRepository.findById(actor.id);
+  if(!account) return false;
+
+  return account.role === 'admin';
 };
 
 export const createProfile = async (data, actor) => {
@@ -83,7 +89,7 @@ export const removeProfile = async (id, actor) => {
   try {
     const existing = await findById(id);
     if(!existing) return Err({ status: 404, message: 'Profile not found' });
-    if(!(await isOwnerOrAdmin(existing, actor.id))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
+    if(!(await isOwnerOrAdmin(existing, actor))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
     await removeById(id);
     return Ok({ success: true });
   } catch(error) {

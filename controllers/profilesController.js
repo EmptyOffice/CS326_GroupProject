@@ -1,7 +1,7 @@
 import { listProfiles, createProfile, removeProfile } from '../services/profilesService.js';
 
 export const index = async (req, res) => {
-  const result = await listProfiles(req.query, req.user);
+  const result = await listProfiles(req.query, req.session.user);
 
   if (!result.ok) {
     return res.status(400).send(`<div class="text-red-500">${result.error.message}</div>`);
@@ -11,7 +11,7 @@ export const index = async (req, res) => {
 };
 
 export const create = async (req, res) => {
-  const result = await createProfile(req.body, req.user);
+  const result = await createProfile(req.body, req.session.user);
 
   if (!result.ok) {
     return res.status(result.error.status || 400).json({ error: result.error.message });
@@ -21,7 +21,7 @@ export const create = async (req, res) => {
 };
 
 export const deleteProfile = async (req, res) => {
-  const result = await removeProfile(req.params.id, req.user);
+  const result = await removeProfile(req.params.id, req.session.user);
 
   if (!result.ok) {
     console.error("Delete error:", result.error);
