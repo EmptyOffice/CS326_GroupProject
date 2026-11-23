@@ -8,8 +8,25 @@ jest.unstable_mockModule('../repositories/profilesRepository.js', () => ({
   removeById: jest.fn(),
 }));
 
+jest.unstable_mockModule('../repositories/usersRepository.js', () => ({
+  findByEmail: jest.fn(),
+  findById: jest.fn(),
+  create: jest.fn(),
+}));
+
 const { createProfile, listProfiles, removeProfile } = await import('../services/profilesService.js');
 const { getAll, removeById } = await import('../repositories/profilesRepository.js');
+const profilesRepository = await import('../repositories/profilesRepository.js');
+const usersRepository = await import('../repositories/usersRepository.js');
+
+const mockUser1 = { id: 'mock1-id' };
+const mockUser2 = { id: 'mock2-id' };
+const admin = { id: 'admin-id' };
+
+beforeEach(() => {
+  jest.resetAllMocks();
+  profilesRepository.create.mockImplementation((data) => ({ id: 'fake-id', ...data }));
+});
 
 test('createProfile rejects a missing name field', async () => {
   const result = await createProfile({ name: '', age: '20', yearsPlayed: '3', availability: 'Weekdays' });
@@ -57,9 +74,9 @@ test('createProfile rejects a ustaRanking value below 0', async () => {
 });
 
 test('createProfile saves a valid profile and returns it', async () => {
-  const result = await createProfile({ name: 'D', age: '22', yearsPlayed: '1', availability: 'Sunday Mornings' });
+  const result = await createProfile({ name: 'D', age: '22', yearsPlayed: '1', availability: 'Sunday Mornings' }, mockUser1);
   expect(result.ok).toBe(true);
-  expect(result.value).toEqual({ id: 'fake-id', name: 'D', age: 22, yearsPlayed: 1, ustaRanking: null, ustaRating: null, availability: 'Sunday Mornings' });
+  expect(result.value).toEqual({ id: 'fake-id', name: 'D', ownerId: 'mock1-id', age: 22, yearsPlayed: 1, ustaRanking: null, ustaRating: null, availability: 'Sunday Mornings' });
 });
 
 test('listProfiles returns profiles sorted alphabetically by name', async () => {
@@ -73,15 +90,44 @@ test('listProfiles returns profiles sorted alphabetically by name', async () => 
 });
 
 test('removeProfile successfully deletes a given profile', async () => {
-  const profile = { id: 'fake-id' };
-  removeById.mockResolvedValueOnce(profile);
-  const result = await removeProfile(profile.id);
+  profilesRepository.findById.mockResolvedValueOnce({ _id: 'fake-id', ownerId: { toString: () => 'mock1-id' }});
+  removeById.mockResolvedValueOnce({ _id: 'fake-id' });
+  const result = await removeProfile('fake-id', mockUser1);
   expect(result.ok).toBe(true);
+  expect(removeById).toHaveBeenCalledWith('fake-id');
 });
 
 test('removeProfile throws an error when deletion fails', async () => {
+  profilesRepository.findById.mockResolvedValueOnce({ _id: 'fake-id', ownerId: { toString: () => 'mock1-id' }});
+
   removeById.mockRejectedValueOnce(new Error('Failed to delete from database'));
-  const result = await removeProfile('fake-id');
+  const result = await removeProfile('fake-id', mockUser1);
   expect(result.ok).toBe(false);
+  expect(result.error.status).toBe(500);
   expect(result.error.message).toBe('Failed to delete from database');
+});
+
+test('removeProfile successfully deletes a profile when attempted by an admin', async () => {
+  profilesRepository.findById.mockResolvedValueOnce({ _id: 'a1', ownerId: { toString: () => 'mock1-id' }});
+  usersRepository.findById.mockResolvedValueOnce({ _id: 'admin-id', role: 'admin' });
+  removeById.mockResolvedValueOnce( { _id: 'a1' });
+  const result = await removeProfile('a1', admin);
+  expect(result.ok).toBe(true);
+  expect(usersRepository.findById).toHaveBeenCalledWith('admin-id');
+});
+
+test('removeProfile successfully deletes a profile when attempted by an owner', async () => {
+  profilesRepository.findById.mockResolvedValueOnce({ _id: 'b1', ownerId: { toString: () => 'mock1-id' }});
+  const result = await removeProfile('b1', mockUser1);
+  expect(result.ok).toBe(true);
+});
+
+test('removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin', async () => {
+  profilesRepository.findById.mockResolvedValueOnce({ _id: 'c1', ownerId: { toString: () => 'mock1-id' }});
+  usersRepository.findById.mockResolvedValueOnce({ _id: 'mock2-id', role: 'member' });
+
+  const result = await removeProfile('c1', mockUser2);
+  expect(usersRepository.findById).toHaveBeenCalledWith('mock2-id');
+  expect(result.ok).toBe(false);
+  expect(result.error.status).toBe(403);
 });

@@ -41,7 +41,7 @@ The Player Profiles page lets you create a tennis player profile and search thro
 ## System Architecture
 
 ### Feature: Player Profiles API
-The backend currently exposes API for managing player profiles at the `/api/profiles` route. 
+The backend currently exposes API for managing player profiles at the `/api/profiles` route.
 
 - **Fetching Profiles:** Sending a `GET` request to `/api/profiles` returns an HTML partial (via EJS) of all registered players, designed to be swapped directly into the DOM using HTMX. You can also append query parameters to filter the results (e.g., `?name=william`, `?ustaRating=4.5`, or `?ustaRanking=10`).
 - **Creating a Profile:** Sending a `POST` request to `/api/profiles` creates a new player. The request body must be a JSON object containing `name` (string), `age` (number, 14+), `yearsPlayed` (number, 0+), and `availability` (string). You may also optionally include `ustaRating` (1.0 - 7.0) and `ustaRanking` (positive number).
@@ -68,6 +68,8 @@ Edelson Garcia (Sprint 4): for login, i decided to use server side sessions with
 Alexandria Anderson (Sprint 2): For the client-side logic, I opted to ensure that USTA ratings and rankings are optional attributes by providing a default value for them when left unprovided. I chose to have these attributes contain a default "Unrated/Unranked" value in the case they were left unfilled. Alternatively, I could have filled these defaults with blank space, or made them undefined and passed them over to an if-else case that builds the player profile without these attributes entirely. However, the latter leads to a lack of consistency within the code and a need for further individual testing (in addition to the default profile with all fields present, 3 extra variations: missing unrated, unranked, or both). While this may keep the profiles as specific as possible, it might also hinder the simplicity of the code in the long run when these profiles may need to be passed to different functions and used elsewhere, as they'll also need to accommodate for multiple variations. Making the default value blank would remove the issue of needing further variations, but may confuse the user with its lack of clarity on why there is no value present. On the other hand, the option I chose avoids both of these potential issues while keeping both the code itself and what the user sees on the page clear and explicit about what information is and isn't present for each player.
 
 Alexandria Anderson (Sprint 3): I decided to use Jest's unstable_mockModule to implement unit tests that mock the repository layer rather than implement integration tests that interact with MongoDB and the repository directly. Although integration testing could guarantee the most accuracy by testing the code directly without emulating anything, and may be able to catch errors and interact with behavior specifically related to the database itself, since we are only using a specific part of MongoDB, I found it more practical to implement unit tests that simply mock the environment. Additionally, since we're only checking the business logic from profilesService with these tests, I would even say it's more effective to isolate these functions from how they interact with the database, in order to be able to test the logic itself. Also, mocking the repository means nothing within the repository layer will actually be affected, meaning there will be no changes made to any of the actual information stored in the database, and no data left behind to clean up after testing.
+
+Alexandria Anderson (Sprint 4): I chose to keep any resource ownership checks within the service layer, as opposed to placing them at the route level along with requireLogin, which checks whether a user is logged in or not before anything else specific to the user or profiles have been loaded. By keeping resource-related checks in the service layer and login checks at the route,  their responsibilities are kept separate and consistent, without having to repeat any authorization logic more than necessary. Also, every caller of the service must pass the ownership requirements, leading to better security. The alternative would have been to keep both types of authorization in the middleware/routes/controller, which could increase readability with everything in one place as well as block unauthorized requests before they can ever reach the service. However, to do this, the related resources would have to be loaded within the route, and it may still be possible to find loopholes around authorization if only the service is called directly.
 
 ## Accessibility Audit (Sprint 4)
 
@@ -113,6 +115,21 @@ Auth routes:
 - `GET /auth/me` returns the logged in user or 401 if nobody is logged in
 
 Why we went with sessions instead of tokens: our app is server rendered with EJS and HTMX, so the browser already sends a cookie with every request and we don't need any extra code on the client to attach a token. Sessions are stored in MongoDB with connect-mongo, so logging out actually ends the session on the server and it survives a server restart. The cookie is httpOnly and sameSite lax so page scripts can't read it.
+
+## Authorization (Sprint 4)
+Profiles can only be deleted by their owner or an admin. A non-admin and/or non-owner attempting to do so will be blocked by a 403 error. This can be tested in the browser:
+
+
+1. Follow the instructions on creating an account and signing in as detailed above in **Accounts and Login**.
+2. Once you've created and logged into an account, register a profile under the /profiles page.
+3. Log out and make another account, following the same instructions as when making the first account.
+4. While logged into the new account, check the /profiles page. Under the list of players, it should not be possible to delete the profile created under the first account.
+
+
+Additionally, three new tests have been implemented for these new authorization rules: "removeProfile successfully deletes a profile when attempted by an admin", "removeProfile successfully deletes a profile when attempted by an owner", and "removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin". To run these tests, enter `npm test` in the terminal as detailed in **Testing** below, and they will be included as part of the test suite.
+
+Since old profiles can only be deleted by an admin, test data needs to be cleared, or make-admin has to be used.
+
 
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:

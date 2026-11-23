@@ -1,5 +1,6 @@
 import { Ok, Err } from '../result.js';
-import { getAll, create, removeById } from '../repositories/profilesRepository.js';
+import { getAll, findById, create, removeById } from '../repositories/profilesRepository.js';
+import * as usersRepository from '../repositories/usersRepository.js';
 
 const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, availability }) => {
   if (!name || !age || !yearsPlayed || !availability) {
@@ -42,15 +43,36 @@ const validateProfile = ({ name, age, yearsPlayed, ustaRating, ustaRanking, avai
   });
 };
 
-export const createProfile = async (data) => {
+const isOwnerOrAdmin = async (profile, actor) => {
+  if(!actor?.id) return false;
+
+  const isOwner = profile.ownerId?.toString() === actor.id.toString();
+  if(isOwner) return true;
+
+  const account = await usersRepository.findById(actor.id);
+  if(!account) return false;
+
+  return account.role === 'admin';
+};
+
+const isAdmin = async (actor) => {
+  if (!actor) return false;
+  if (actor.role) return actor.role === 'admin';
+  return (await usersRepository.findById(actor.id))?.role === 'admin';
+};
+
+const canChange = (profile, actor, admin) => Boolean(actor) && (admin || profile.ownerId?.toString() === actor.id);
+
+export const createProfile = async (data, actor) => {
   const result = validateProfile(data);
   if (!result.ok) return result;
 
-  const newProfile = await create(result.value);
+  const newProfile = await create({ ...result.value, ownerId: actor.id });
   return Ok(newProfile);
 };
 
-export const listProfiles = async (filters = {}) => {
+export const listProfiles = async (filters = {}, actor = undefined) => {
+  const admin = await isAdmin(actor);
   let profiles = await getAll();
 
   if (filters.name) {
@@ -69,14 +91,21 @@ export const listProfiles = async (filters = {}) => {
   }
 
   profiles.sort((a, b) => a.name.localeCompare(b.name));
-  return Ok(profiles);
+  return Ok(profiles.map((profile) => ({
+    ...profile,
+    id: profile._id.toString(),
+    canChange: canChange(profile, actor, admin),
+  })));
 };
 
-export const removeProfile = async (id) => {
+export const removeProfile = async (id, actor) => {
   try {
+    const existing = await findById(id);
+    if(!existing) return Err({ status: 404, message: 'Profile not found' });
+    if(!(await isOwnerOrAdmin(existing, actor))) return Err({ status: 403, message: 'You do not have permission to delete this profile' });
     await removeById(id);
     return Ok({ success: true });
-  } catch (error) {
+  } catch(error) {
     return Err({ status: 500, message: 'Failed to delete from database' });
   }
 };
