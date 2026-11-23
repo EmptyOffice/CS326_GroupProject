@@ -36,6 +36,7 @@ if (authForm) {
       errorBox.textContent = `Something went wrong. ${error.message}`;
     } finally {
       button.disabled = false;
+      if (document.activeElement === document.body) button.focus();
     }
   });
 }

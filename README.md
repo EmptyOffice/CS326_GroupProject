@@ -50,25 +50,29 @@ The backend currently exposes API for managing player profiles at the `/api/prof
 ### API Request Flow
 Here is the path of how client requests like fetching or creating a profile flow through our application backend:
 
-![System Diagram](./326_diagram_sprint3_fixed.png)
+![System Diagram](./326_diagram_sprint4.png)
 
-### Health Check
+###     Health check
 
-GET /health is a public endpoint for deployment monitoring. It needs no login, cookie, or token, and always returns 200 OK with JSON:
+`GET /health` is a public endpoint for deployment monitoring. It needs no login, cookie, or token, and always returns `200 OK` with JSON:
 
+```
 $ curl -i http://localhost:3000/health
 HTTP/1.1 200 OK
 Content-Type: application/json; charset=utf-8
 
 {"status":"ok","uptime":42,"timestamp":"2026-11-17T05:18:59.379Z"}
+```
 
-It lives in routes/health.js and is mounted in server.js above the session middleware, so it never requires a login. Keep any auth middleware below this line.
+It lives in `routes/health.js` and is mounted in `server.js` above the session middleware, so it never requires a login. Keep any auth middleware below that line.
 
 ### Design Decisions
 
-William Bae: For handling errors in our backend, I decided to return custom success and error objects (like `{ ok: true }` or `{ ok: false, error }`) from our service file rather than throwing standard JavaScript errors and using try/catch in the controller. While using try/catch is the standard way to handle errors in Node.js, returning an object is better for our specific code because it forces us to explicitly check if a function worked (`if (!result.ok)`) before sending a response to the user. Also, a normal catch block can sometimes accidentally hide system crashes like spelling mistakes by treating them as user errors. By returning an error object on purpose, we get information as to why a validation failed without hiding bigger bugs.
+William Bae (Sprint 2): For handling errors in our backend, I decided to return custom success and error objects (like `{ ok: true }` or `{ ok: false, error }`) from our service file rather than throwing standard JavaScript errors and using try/catch in the controller. While using try/catch is the standard way to handle errors in Node.js, returning an object is better for our specific code because it forces us to explicitly check if a function worked (`if (!result.ok)`) before sending a response to the user. Also, a normal catch block can sometimes accidentally hide system crashes like spelling mistakes by treating them as user errors. By returning an error object on purpose, we get information as to why a validation failed without hiding bigger bugs.
 
 William Bae (Sprint 3): When implementing HTMX for our search filter, I chose to construct the server's HTML response using EJS partial files rather than returning raw HTML template strings directly from the controller. While returning raw HTML strings (e.g., `res.send('<div>' + profile.name + '</div>')`) would have technically worked, we decided to use EJS partials because it enforces separation of concerns and provides built-in security for our matchmaker app. Specifically for our app, if someone registered a player name containing HTML tags, building an HTML string directly in the controller would allow that HTML to run in the page when the HTMX search results render, and it will break the layout or run unwanted code. EJS prevents this by automatically escaping a player's name, so it is the safer choice.
+
+William Bae (Sprint 4): For the accessibility audit, I decided that after a player card is deleted, keyboard focus moves to the next card's Delete button (or the previous card's if it was the last one, or the "Players" heading if the list is now empty). The alternative was to always send focus back to the "Players" heading after a delete, which is simpler and common. I think our version is better for this app because deleting is something people repeat, especially an admin cleaning up old or test profiles, who sees a Delete button on every card. With focus on the next Delete button, they can just press Enter again. If focus always went to the heading, they would have to Tab back down through the list to find their place after every single delete, which gets slow with a long list of players. The cost of my approach is more code in public/app.js. It has to remember the card's neighbor before HTMX removes it and handle the edge cases (last card, empty list, next card has no Delete button) that the heading-only version never has to think about.
 
 Edelson Garcia (Sprint 2): For the profiles page, I decided to have `profiles.ejs` render an empty `#profiles-list` and let `app.js` fill it in by fetching the JSON from `/api/profiles`. The alternative I'd say was to have the server pass the profiles into the EJS template and loop over them with `<% profiles.forEach(...) %>` kinda like some of the earlier exercises we did in the class, which is typically seen as a normal way to do it in Express. I think that our version is a bit better because the same JSON endpoint handles both the first load and every search, so searching or creating a profile updates the list without needing to reload the whole page, and the search boxes keep what you typed making it less frustrating for the user when searching/filtering. If we rendered the list on the server, every search would need a full page refresh, and the controller would need a second path that sends back HTML on top of the JSON one that `app.js` already uses right now. The cost of this design choice is that the list depends on JavaScript, so if `app.js` fails to load the page shows the forms but no players. This in my opninion is a fair sacraftice because every modern browser typically runs JavaScript and the forms already need it to submit.
 
@@ -84,18 +88,20 @@ Alexandria Anderson (Sprint 4): I chose to keep any resource ownership checks wi
 
 ## Accessibility Audit (Sprint 4)
 
-We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using only the keyboard, and measured color contrast on the rendered pages (normal and hover states) with a WCAG contrast checker. The target is WCAG AA (at least 4.5:1 for text).
+We audited the Home page (`/`), the Player Profiles page (`/profiles`), and the Log In and Sign Up pages (`/login`, `/signup`) using only the keyboard, and measured color contrast on the rendered pages (normal and hover states) with a WCAG contrast checker. The target is WCAG AA (at least 4.5:1 for text).
 
 ### Fixes
 
 | # | Area | What we found | What we fixed | How to check |
 |---|---|---|---|---|
-| 1 | Keyboard | Every link, button and input could be reached with Tab, but the focus indicator was only the browser's thin default outline, which is hard to see on the blue and green buttons. | Added one consistent 3px blue focus ring for all links, buttons, inputs and focusable headings (`:focus-visible` rule in `src/input.css`). It only shows for keyboard users, not mouse clicks. | Press Tab through each page. Every control gets a thick blue outline, in top-to-bottom order: search fields, Search, Clear, the six create fields, Create Profile, then each card's Delete button. |
+| 1 | Keyboard | Every link, button and input could be reached with Tab, but the focus indicator was only the browser's thin default outline, which is hard to see on the blue and green buttons. | Added one consistent 3px blue focus ring for all links, buttons, inputs and focusable headings (`:focus-visible` rule in `src/input.css`). It only shows for keyboard users, not mouse clicks. | Press Tab through each page. Every control gets a thick outline, in top-to-bottom order. On `/profiles`: the nav links, search fields, Search, Clear, the six create fields, Create Profile, then each Delete button you are allowed to use. On `/login` and `/signup`: the nav links, Email, Password, the submit button, then the link to the other page. |
 | 2 | Focus after delete | Deleting a card removed the Delete button that had focus, so focus fell back to the top of the page (`<body>`). | `public/app.js` remembers the card's neighbor before HTMX removes it, then moves focus to the next card's Delete button (or the previous one if it was the last card, or the "Players" heading if the list is now empty). | Tab to a Delete button in the middle of the list and press Enter. Focus lands on the next card's Delete button. Delete every card and focus lands on the "Players" heading. |
 | 3 | Focus after create | Disabling the Create Profile button while saving dropped focus to `<body>`. Errors appeared in an `alert()` pop-up. | Focus returns to the Create Profile button after saving. Errors now appear inline under the form in a `role="alert"` box that screen readers read out. | Fill the form with the keyboard and press Enter on Create Profile. Focus stays on the button. Submit with a required field empty to see the inline error. |
 | 4 | Screen reader updates | Search results, new profiles and deletions changed the page silently, so screen reader users got no feedback. | Added a hidden live region (`#status`, `aria-live="polite"`) that announces "3 players found.", "No players found.", "Profile created for ...", "... deleted." and "Could not delete ..." | With a screen reader on (VoiceOver: Cmd+F5, NVDA on Windows), run a search or delete a card and listen for the announcement. Or watch the `#status` element in DevTools. |
 | 5 | Labels | The three search inputs (name, rating, ranking) had only placeholder text and no `<label>`. | Added a `<label for>` for each search input (visually hidden with `sr-only`, so the layout is unchanged). The six create-form inputs already had visible labels. Delete buttons now say which player they delete (`aria-label="Delete <name>"`). | In DevTools, inspect a search input: the Accessibility pane shows its name ("Search by name", etc.). With a screen reader, Tab to a Delete button and it reads "Delete Alice Kim". |
 | 6 | Contrast | Measured on the rendered page: Create Profile button 3.22:1, Delete button 3.81:1, Clear button on hover 3.96:1, "No profiles found" text 3.81:1. All below 4.5:1. | Create Profile: `green-700` (hover `green-800`). Delete: `red-700` (hover `red-800`). Clear: hover lightens to `gray-200` with `gray-800` text. "No profiles found" and form errors: `red-700`. Footer text darkened to `gray-600`. Input borders darkened to `gray-500` so the fields are visible. | Use a contrast checker (e.g. the WebAIM Contrast Checker, or the contrast ratio in Chrome DevTools' color picker) on each item, including while hovering. |
+| 7 | Focus ring on the nav bar | After the nav bar was added to every page, the blue focus ring on nav links and buttons was almost invisible against the blue nav (1.30:1). | Nav links and buttons get a white focus ring instead (5.25:1 against the nav), in `src/input.css`. | On any page, Tab into the nav (PV Tennis, Players, Log in / Sign up or Log out). The focused item has a clear white outline. |
+| 8 | Log In and Sign Up pages | Both forms already had a real `<label for>` on Email and Password, the password hint is linked with `aria-describedby`, and errors show in a `role="alert"` box. One problem: pressing Enter on the submit button with a wrong password disabled the focused button and dropped focus to `<body>`. | `public/auth.js` puts focus back on the submit button after a failed login or signup. | On `/login`, Tab to **Log In** with a wrong password and press Enter. The error appears under the form and focus stays on the button. |
 
 ### Contrast after the fixes (measured on the rendered page)
 
@@ -110,6 +116,12 @@ We audited the Home page (`/`) and the Player Profiles page (`/profiles`) using 
 | Availability text (gray-500 on white) | 4.84:1 | n/a |
 | "No profiles found" / error text (red-700) | 6.42:1 | n/a |
 | Footer text (gray-600 on gray-50) | 7.23:1 | n/a |
+| Nav links and "Logged in as" text (white on blue-600) | 5.25:1 | n/a |
+| Nav Sign up / Log out button (blue-700 on white / blue-100) | 6.83:1 | 5.60:1 |
+| Log In button (white on blue-600 / blue-700) | 5.25:1 | 6.83:1 |
+| Create Account button (white on green-700 / green-800) | 4.95:1 | 7.13:1 |
+| "Sign up" / "Log in" links under the forms (blue-700 on white) | 6.83:1 | n/a |
+| Login / signup error text (red-700 on white) | 6.42:1 | n/a |
 
 ## Accounts and Login (Sprint 4)
 Players can now make an account and log in. Accounts are saved in MongoDB and passwords are hashed with bcrypt, so the real password is never stored.
@@ -146,4 +158,6 @@ Since old profiles can only be deleted by an admin, test data needs to be cleare
 To run the automated tests for this application, run the following command in your terminal:
 `npm test`
 
-The test files are located in `__tests__/profilesService.test.js`.
+The tests run without a database (the repository is mocked) and are in `__tests__/`:
+- `profilesService.test.js`: profile validation, search, delete, and the authorization rule (owner, admin, and a non-owner getting `403`)
+- `health.test.js`: `GET /health` returns `200` JSON with `status: "ok"` and works with no cookie
