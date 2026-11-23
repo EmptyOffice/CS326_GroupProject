@@ -23,8 +23,6 @@ const mockUser1 = { id: 'mock1-id' };
 const mockUser2 = { id: 'mock2-id' };
 const admin = { id: 'admin-id' };
 
-// NOTE: Since old profiles can only be deleted by an admin, test data needs to be cleared, or make-admin has to be used.
-
 beforeEach(() => {
   jest.resetAllMocks();
   profilesRepository.create.mockImplementation((data) => ({ id: 'fake-id', ...data }));

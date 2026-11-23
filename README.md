@@ -128,6 +128,8 @@ Profiles can only be deleted by their owner or an admin. A non-admin and/or non-
 
 Additionally, three new tests have been implemented for these new authorization rules: "removeProfile successfully deletes a profile when attempted by an admin", "removeProfile successfully deletes a profile when attempted by an owner", and "removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin". To run these tests, enter `npm test` in the terminal as detailed in **Testing** below, and they will be included as part of the test suite.
 
+Since old profiles can only be deleted by an admin, test data needs to be cleared, or make-admin has to be used.
+
 
 ## Testing
 To run the automated tests for this application, run the following command in your terminal:
