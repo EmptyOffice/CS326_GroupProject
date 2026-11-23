@@ -11,3 +11,10 @@
     outline-offset: 2px;
   }
 }
+
+@layer base {
+  nav a:focus-visible,
+  nav button:focus-visible {
+    outline-color: var(--color-white);
+  }
+}
