@@ -22,6 +22,7 @@ Instructions to run the server:
 - Install dependencies: `npm install`
 - Start your MongoDB database (e.g., via Docker Desktop using the provided docker-compose.yml)
 - Build the Tailwind CSS: `npm run build:css`
+- Copy the environment file: `cp .env.example .env` (then change `SESSION_SECRET` to any long random string)
 - Start the server: `npm start`
 - Visit the server at http://localhost:3000
 
