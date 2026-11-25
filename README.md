@@ -85,7 +85,7 @@ Alexandria Anderson (Sprint 2): For the client-side logic, I opted to ensure tha
 
 Alexandria Anderson (Sprint 3): I decided to use Jest's unstable_mockModule to implement unit tests that mock the repository layer rather than implement integration tests that interact with MongoDB and the repository directly. Although integration testing could guarantee the most accuracy by testing the code directly without emulating anything, and may be able to catch errors and interact with behavior specifically related to the database itself, since we are only using a specific part of MongoDB, I found it more practical to implement unit tests that simply mock the environment. Additionally, since we're only checking the business logic from profilesService with these tests, I would even say it's more effective to isolate these functions from how they interact with the database, in order to be able to test the logic itself. Also, mocking the repository means nothing within the repository layer will actually be affected, meaning there will be no changes made to any of the actual information stored in the database, and no data left behind to clean up after testing.
 
-Alexandria Anderson (Sprint 4): I chose to keep any resource ownership checks within the service layer, as opposed to placing them at the route level along with requireLogin, which checks whether a user is logged in or not before anything else specific to the user or profiles have been loaded. By keeping resource-related checks in the service layer and login checks at the route,  their responsibilities are kept separate and consistent, without having to repeat any authorization logic more than necessary. Also, every caller of the service must pass the ownership requirements, leading to better security. The alternative would have been to keep both types of authorization in the middleware/routes/controller, which could increase readability with everything in one place as well as block unauthorized requests before they can ever reach the service. However, to do this, the related resources would have to be loaded within the route, and it may still be possible to find loopholes around authorization if only the service is called directly.
+Alexandria Anderson (Sprint 4): I chose to keep any resource ownership checks within the service layer, as opposed to placing them at the route level along with `requireLogin`, which checks whether a user is logged in or not before anything else specific to the user or profiles have been loaded. By keeping resource-related checks in the service layer and login checks at the route,  their responsibilities are kept separate and consistent, without having to repeat any authorization logic more than necessary, and every caller of the service must pass the ownership requirements, leading to better security. By using `isOwnerOrAdmin` to determine in the service layer both whether to show a profile's delete button in the player list and whether a profile can be deleted by a given user, the logic is simplified between listing and removing profiles, and no further checks are needed from the frontend. The alternative would have been to keep both types of authorization in the middleware/routes/controller, which could increase readability with everything in one place as well as block unauthorized requests before they can ever reach the service. However, to do this, the related resources would have to be loaded within the route, and it may still be possible to find loopholes around authorization if only the service is called directly.
 
 ## Accessibility Audit (Sprint 4)
 
@@ -141,14 +141,43 @@ Auth routes:
 Why we went with sessions instead of tokens: our app is server rendered with EJS and HTMX, so the browser already sends a cookie with every request and we don't need any extra code on the client to attach a token. Sessions are stored in MongoDB with connect-mongo, so logging out actually ends the session on the server and it survives a server restart. The cookie is httpOnly and sameSite lax so page scripts can't read it.
 
 ## Authorization (Sprint 4)
-Profiles can only be deleted by their owner or an admin. A non-admin and/or non-owner attempting to do so will be blocked by a 403 error. This can be tested in the browser:
+Profiles can only be deleted by their owner or an admin. A non-admin and/or non-owner attempting to do so will be blocked by a 403 error. This can be tested both in the browser and using curl commands:
 
-
+### Using browser:
 1. Follow the instructions on creating an account and signing in as detailed above in **Accounts and Login**.
 2. Once you've created and logged into an account, register a profile under the /profiles page.
 3. Log out and make another account, following the same instructions as when making the first account.
 4. While logged into the new account, check the /profiles page. Under the list of players, it should not be possible to delete the profile created under the first account.
 
+### Using curl:
+1. Sign up for an account by pasting the following command, replacing `"USER@email.com"` and `"PASSWORD"` accordingly if you wish:
+  `curl -i -X POST http://localhost:3000/auth/signup \
+    -H "Content-Type: application/json" \
+    -d '{"email": "USER@email.com","password": "PASSWORD"}'
+    -c cookies.txt`
+2. Log in using the same email and password from above:
+  `curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"USER@email.com","password":"PASSWORD"}' \
+    -c cookies.txt \
+    -b cookies.txt`
+3. Create a profile:
+  `curl -i -X POST http://localhost:3000/api/profiles \
+    -H "Content-Type: application/json" \
+    -b cookies.txt \
+    -d '{"name": "Test","age": "25","yearsPlayed": "0","availability":"Weekends"}'`
+4. Log out of your current account:
+  `curl -i -X POST http://localhost:3000/auth/logout \
+    -b cookies.txt \
+    -c cookies.txt`
+5. Create another new account using the same command as step 1, with a different email and password than the first.
+6. Log into this account using the same command as step 2.
+7. View the list of profile ids, and find the ID of the profile you made in step 3 listed under `data-profile-id="..."`:
+  `curl -i http://localhost:3000/api/profiles`
+8. Attempt to delete the other account's profile by replacing `PROFILEID` with the ID you just copied from the previous step:
+  `curl -i -X DELETE http://localhost:3000/api/profiles/PROFILEID \
+    -b cookies.txt`
+  The server should return a 403 error.
 
 Additionally, three new tests have been implemented for these new authorization rules: "removeProfile successfully deletes a profile when attempted by an admin", "removeProfile successfully deletes a profile when attempted by an owner", and "removeProfile throws a 403 error when deletion is attempted by a non-owner and non-admin". To run these tests, enter `npm test` in the terminal as detailed in **Testing** below, and they will be included as part of the test suite.
 
